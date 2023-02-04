@@ -5,6 +5,7 @@ const search = document.getElementById("search")
 const form = document.getElementById("form")
 
 getUser('gideon5')
+
 async function getUser(username){
    const resp = await fetch(APIURL + username)
     respData = await resp.json()
@@ -15,17 +16,20 @@ async function getUser(username){
 }
 
 async function getRepos(username){
-    const resp = await fetch (APIURL + username)
-    const respData = resp.json()
+    const resp = await fetch (APIURL + username + "/repos")
+    const respData = await resp.json()
 
     addReposToCard(respData)
 
 }
 
+
+
 function createUserCard(user){
     const cardHTML = 
-    `<div class="card"
-    <div class="img-container">
+    `
+    <div class="card">
+    <div>
     <img class="avatar" src="${user.avatar_url}" alt="${user.name}"/>
     </div>
     <div class="user-info">
@@ -36,7 +40,8 @@ function createUserCard(user){
         <li><strong>Following </strong>${user.following}</li>
         <li><strong>Repos </strong>${user.public_repos}</li>
         </ul>
-        <div id="repos" class="repos">
+
+        <div id="repos">
         </div>
 
     </div>
@@ -51,9 +56,12 @@ function createUserCard(user){
 function addReposToCard(repos){
     const reposEl = document.getElementById("repos")
 
-    repos.forEach((repo) => {
-        const repoEl = document.createElement("a")
-        repoEl.classList.add("repo")
+    repos
+    .sort((a,b) => b.stargazers_count > a.stargazers_count  )
+    .slice(0,10)
+    .forEach(repo => {
+        const repoEl = document.createElement('a')
+        repoEl.classList.add('repo')
 
         repoEl.href = repo.html_url
         repoEl.target = "_blank"
@@ -62,20 +70,7 @@ function addReposToCard(repos){
         reposEl.appendChild(repoEl)
     })
 
-    repos.forEach((repo) => {
-        const repoEl = document.createElement("a");
-        repoEl.classList.add("repo");
-
-        repoEl.href = repo.html_url;
-        repoEl.target = "_blank";
-        repoEl.innerText = repo.name;
-
-        reposEl.appendChild(repoEl);
-    });
-
-
-
-
+    
 }
 
 form.addEventListener('submit', (e)=>{
